@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projet 52 cartes - Catalogue de jeux à matériel simple</title>
+
+    <!-- La descripción que aparece debajo del título en Google (máximo 155 caracteres) -->
+    <meta name="description" content="Découvrez plus de 90 jeux de société adaptés pour jouer avec presque rien : un jeu de cartes standard, quelques dés et du matériel du quotidien.">
+    
+    <!-- Palabras clave para ayudar al buscador -->
+    <meta name="keywords" content="jeux de société, adaptations, matériel simple, cartes, dés, print and play, PnP, jeux gratuits">
+
+    <!-- Configuración para redes sociales (Open Graph) -->
+    <meta property="og:title" content="Projet 52 Cartes">
+    <meta property="og:description" content="Le catalogue ultime des adaptations de jeux à matériel réduit.">
+    <meta property="og:url" content="https://ramiro1000fuegos.github.io/projet52cartes/">
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- ############################################################################################################################################## -->
+<!-- ##                                                                                                                                          ## -->
+<!-- ##                                                                CSS                                                                       ## -->    
+<!-- ##                                                                                                                                          ## -->    
+<!-- ############################################################################################################################################## -->    
+ 
+    
+    <style>
+        [v-cloak] { display: none; }
+        /* Botones de Jugadores */
+        .btn-player { 
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s; 
+            font-weight: bold; 
+            border-radius: 0.75rem; 
+            text-align: center; 
+            padding: 0.5rem 0; 
+            font-size: 0.875rem; 
+            cursor: pointer; 
+        }
+        .btn-player-active { background-color: #1e1b4b; border-color: #1e1b4b; color: white; }
+        .btn-player-inactive { background-color: white; color: #64748b; }
+        .btn-player-inactive:hover { border-color: #444444 }
+
+        .attr-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            border: 1px solid #cbd5e1; /* Slate 200: Borde estandar */
+            padding: 3px 12px;
+            border-radius: 50px; /* Forma de cápsula */
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #334155;     /* Slate 700: Gris muy oscuro */
+            background-color: #fbfcfd; /* Slate 25: Gris fantasma */            
+            /*margin-bottom: 4px;*/
+        }
+
+        .cat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            border: 1px solid #c7d2fe; /* Borde Indigo 200 */
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            /*text-transform: uppercase;*/    
+            /* CONTRASTE MEJORADO */
+            color: #312e81;     /* Indigo 900: Azul casi negro */
+            background-color: #eff6ff; /* Azul muy muy claro */
+        }        
+
+        .section-card { @apply bg-white p-6 md:p-8 rounded-[2.5rem] shadow-xl border border-slate-200 mb-8; }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        .fidelity-box {
+            padding: 10px 14px;        /* Padding reducido y compensado */
+            margin-bottom: 12px;       /* Espacio con los botones de abajo */
+            font-size: 0.9rem;            
+        }
+
+        .btn-corner {
+            width: 42px; /* Tamaño táctil ideal */
+            height: 42px;
+            min-width: 42px; /* Evita que se encoja en pantallas pequeñas */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px; /* Círculo perfecto */
+            background-color: white;
+            border: 2px solid #f1f5f9;
+            color: #94a3b8;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-size: 1.4rem;
+            font-weight: 800;                        
+        }
+        .btn-corner:hover {
+            border-color: #cbd5e1;
+            color: #6366f1;
+            background-color: #f8fafc;
+            font-size: 1.4rem;
+            font-weight: 800;            
+        }
+        
+        /* Ajuste para el contenedor de la búsqueda para que los círculos no se peguen */
+        .search-container {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Espacio entre el input y los botones */
+        }        
+        
+        /* 1. Botón Principal (Reglas Móvil) - Indigo Profundo: Denota autoridad y acción principal */
+        .btn-mobile {
+            background-color: #1e1b4b; /* Indigo 950: Azul casi negro */
+            color: white;
+            font-size: .9rem;
+            font-weight: 700;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-mobile:hover { background-color: #312e81; /* Indigo 900 */ }
+        
+        /* 2. Botón Secundario (PDF) - Verde Bosque/Ceniza: Diferente al azul pero calmado, invita a la utilidad */
+        .btn-pdf {
+            background-color: #4338ca; /* Indigo 700: Azul vibrante pero serio */
+            color: white;
+            font-size: .9rem;
+            font-weight: 700;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-pdf:hover { background-color: #3730a3; /* Indigo 800 */ }
+        
+        /* 3. Botón Terciario (BGG) - Gris Neutro: Parece un botón de "fuente" o "archivo", no compite con los otros */
+        .btn-bgg {
+            background-color: #e2e8f0; /* Slate 200: Gris claro con matiz azul */
+            color: #334155;            /* Slate 700: Texto oscuro para contraste */
+            font-size: .9rem;
+            font-weight: 700;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-bgg:hover {
+            background-color: #cbd5e1; /* Slate 300 */
+            color: #1e293b;            /* Slate 800: texto un poco más oscuro */ 
+        }
+        
+        .check-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background-color: #fbfcfd;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .check-card:hover { border-color: #6366f1; background-color: #f5f7ff; }
+        .check-card input {
+            width: 18px;
+            height: 18px;
+            accent-color: #1e1b4b;
+            margin-top: 2px;
+        }
+        .check-card span { font-size: 13px; color: #475569; line-height: 1.3; font-weight: 500; }
+        
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.7); /* Slate 900 opaco */
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 28rem;
+            width: 100%;
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        /* Contenedor del Tooltip */
+        .has-tooltip {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        /* La burbuja de texto */
+        .tooltip-text {
+            visibility: hidden;
+            position: absolute;
+            bottom: 110%; /* Aparece arriba del botón */
+            background-color: #1e293b; /* Slate 800 */
+            color: #ffffff;
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            transform: translateY(5px);
+            pointer-events: none; /* Para que no interfiera con el clic */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Triángulo del tooltip */
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+        
+        /* Mostrar al hacer Hover */
+        .has-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Asegurar cursor de mano en todos los controles */
+        button, select, .game-card {
+            cursor: pointer;
+        }
+
+        /* Badge de puntuación más grande y legible */
+        .score-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            min-width: 100px; /* Un poco más de espacio horizontal */
+        }
+        
+        .community-avg-text {
+            font-size: 1.25rem; /* 20px - Grande y claro */
+            font-weight: 900;
+            color: #0f172a; /* Slate 900 */
+            line-height: 1;
+        }
+        
+        .community-count-text {
+            font-size: 12px; /* text-xs */
+            font-weight: 700;
+            color: #64748b; /* Slate 500 */
+            text-transform: uppercase;
+            tracking-tighter;
+        }        
+        
+    </style>
+</head>
+
+<!-- ############################################################################################################################################## -->
+<!-- ##                                                                                                                                          ## -->
+<!-- ##                                                                HTML                                                                      ## -->    
+<!-- ##                                                                                                                                          ## -->    
+<!-- ############################################################################################################################################## -->    
+    
+<body class="bg-slate-50 p-4 font-sans text-slate-900 tracking-tight">
+
+<div id="app" v-cloak class="max-w-6xl mx-auto pb-20">
+        
+<!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        HEATHER
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+        <header class="py-4 flex flex-col md:flex-row justify-between items-start gap-8 border-b border-slate-200 mb-4 md:mb-10">
+          
+            <div class="max-w-2xl">
+                <h1 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase leading-none mb-4">
+                    PROJET <span class="text-indigo-600">52 CARTES</span>
+                </h1>
+                <p class="text-lg font-bold text-slate-600 leading-tight">
+                    {{ filteredGames.length }} jeux adaptés au matériel du quotidien.  <!-- {{ games.length }} -->
+                </p>
+            </div>
+
+            <!-- Badge de Entorno (Solo visible si NO es PROD) -->
+            <div v-if="env !== 'PROD'" 
+                 class="fixed bottom-6 left-6 z-[10000] animate-pulse">
+                <div class="bg-amber-500 text-white text-[10px] font-black px-4 py-2 rounded-2xl shadow-2xl border-2 border-white uppercase tracking-tighter">
+                    🛠️ Mode {{ env }}
+                </div>
+            </div>
+            
+        </header>
+    
+<!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        RECHERCHE
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+        <section id="filter-section" class="section-card sticky top-0 rounded-t-none z-40 bg-white/95 backdrop-blur-sm shadow-xl mb-6 rounded-xl">
+
+            <div class="px-2 pt-2 md:px-4 md:pt-4 flex items-center search-container">
+                <!-- El buscador ocupa el espacio sobrante -->
+                <div class="relative group flex-1">
+                    <!-- Icono Lupa -->
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                    </div>
+                    
+                    <!-- Input -->
+                    <input type="text" 
+                           v-model="searchQuery" 
+                           placeholder="Jeu, auteur, année, catégorie, mécanique..." 
+                           class="w-full bg-slate-50 border-2 border-slate-100 py-2.5 pl-10 pr-10 rounded-xl text-xs font-bold outline-none focus:border-indigo-500 focus:bg-white transition-all shadow-sm">
+                    
+                    <!-- Botón de borrar (X) -->
+                    <button v-if="searchQuery.length > 0" 
+                            @click="searchQuery = ''" 
+                            class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-300 hover:text-rose-500 transition-colors">
+                        <i class="fa-solid fa-circle-xmark text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Botones de ayuda (Círculos) -->
+                <button @click="showHelpPopup = true" class="btn-corner" title="Aide">
+                    <i class="fa-solid fa-question text-sm"></i> <!--<i class="fa-solid fa-circle-question"></i>-->
+                </button>                
+                <button @click="showInfoPopup = true" class="btn-corner" title="Informations">
+                    <i class="fa-solid fa-info text-sm"></i> <!-- <i class="fa-solid fa-circle-info"></i>-->
+                </button>
+                
+            </div>
+
+            <!--------------------------------------------------------------------------------------------------------------------------------------------------->
+            
+            <!--<div class="grid grid-cols-2 md:grid-cols-12 gap-x-4 gap-y-3 items-start p-2 md:p-4">-->
+            <div class="grid grid-cols-2 md:grid-cols-12 gap-2 items-start p-2 md:p-4">
+                
+                <!-- Joueurs -->
+                <div class="col-span-2 md:col-span-5">
+                    <h3 class="text-xs font-black uppercase text-slate-400 mb-1 tracking-widest">&nbsp;Joueurs</h3>
+                        
+                    <!-- Fila 1: 1-5 + Control -->
+                    <div class="grid grid-cols-6 gap-2 mb-2 items-center text-center">
+                        <button v-for="n in 5" :key="n" @click="togglePlayer(n)" 
+                                :class="selectedPlayers.includes(n) ? 'btn-player-active' : 'btn-player-inactive'" class="btn-player">
+                            {{n}}
+                        </button>
+                        <button @click="toggleRange6to10" class="flex items-center justify-left text-slate-400 hover:text-slate-600 transition-colors h-10 w-10 mx-auto">
+                            <i class="fa-solid" :class="showRange6to10 ? 'fa-circle-minus text-xl' : 'fa-circle-plus text-xl'"></i>
+                        </button>
+                    </div>
+                
+                    <!-- Fila 2: 6-10 + Control -->
+                    <div v-if="showRange6to10" class="grid grid-cols-6 gap-2 mb-2 items-center text-center animate-fade-in">
+                        <button v-for="n in [6,7,8,9,10]" :key="n" @click="togglePlayer(n)" 
+                                :class="selectedPlayers.includes(n) ? 'btn-player-active' : 'btn-player-inactive'" class="btn-player">
+                            {{n}}
+                        </button>
+                        <button @click="toggleRange11to20" class="flex items-center justify-left  text-slate-400 hover:text-slate-600 transition-colors h-10 w-10 mx-auto">
+                            <i class="fa-solid" :class="showRange11to20 ? 'fa-circle-minus text-xl' : 'fa-circle-plus text-xl'"></i>
+                        </button>
+                    </div>
+                
+                    <!-- Rango 11 a 20 (Alineado con lo anterior) -->
+                    <div v-if="showRange11to20" class="animate-fade-in">
+                        <!-- Fila 3: 11-15 + Espacio vacío -->
+                        <div class="grid grid-cols-6 gap-2 mb-2 items-center">
+                            <button v-for="n in [11,12,13,14,15]" :key="n" @click="togglePlayer(n)" 
+                                    :class="selectedPlayers.includes(n) ? 'btn-player-active' : 'btn-player-inactive'" class="btn-player">
+                                {{n}}
+                            </button>
+                            <div class="h-10 w-10"></div> <!-- Celda 6 vacía para mantener el ancho -->
+                        </div>
+                
+                        <!-- Fila 4: 16-20 + Espacio vacío -->
+                        <div class="grid grid-cols-6 gap-2 items-center">
+                            <button v-for="n in [16,17,18,19,20]" :key="n" @click="togglePlayer(n)" 
+                                    :class="selectedPlayers.includes(n) ? 'btn-player-active' : 'btn-player-inactive'" class="btn-player">
+                                {{n}}
+                            </button>
+                            <div class="h-10 w-10"></div> <!-- Celda 6 vacía para mantener el ancho -->
+                        </div>
+                    </div>
+                </div>
+
+                <!--------------------------------------------------------------------------------------------------------------------------------------------------->
+                
+                <!-- Fila de filtros: Matériel (1/3), Âge (1/3), Boutons (1/3) -->
+                <div class="col-span-2 md:col-span-7 grid grid-cols-3 gap-2 md:gap-4 items-end">                    
+
+                    <!-- Âge (1 de 3) -->
+                    <div class="flex flex-col">              
+                        <h3 class="text-xs font-black uppercase text-slate-400 mb-1 tracking-widest">&nbsp;Âge</h3>
+                        <select v-model="filters.age" class="w-full bg-slate-50 border-2 border-slate-100 p-2 rounded-xl text-xs font-bold outline-none focus:border-indigo-500">
+                            <option :value="99">Sans limite</option>
+                            <option v-for="a in [12,10,8,6]" :value="a">{{a}}-{{a+1}} ans</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Material (1 de 3) -->
+                    <div class="flex flex-col">
+                        <div class="flex justify-between items-center mb-1">
+                            <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">&nbsp;Matériel</h3>
+                        </div>
+                        <select v-model="filters.material" class="w-full bg-slate-50 border-2 border-slate-100 p-2 rounded-xl text-xs font-bold outline-none focus:border-indigo-500">
+                            <option value="4">Maxi</option>
+                            <option value="3">Standard</option>
+                            <option value="2">Mini</option>
+                            <option value="1">Micro</option>
+                        </select>
+                    </div>
+
+                    <!--------------------------------------------------------------------------------------------------------------------------------------------------->
+                    
+                    <!-- 3. Groupe de 3 Boutons (Flash, Fav, New) -->
+                    <div class="flex flex-col">
+                        <!-- Etiqueta unificada para indicar que es un ORDEN -->
+                        <h3 class="text-xs font-black uppercase text-slate-400 text-center tracking-widest  mb-1">Priorité</h3>
+                        <div class="grid grid-cols-3 gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+                            <!-- Botón Flash -->
+                            <div class="has-tooltip">
+                                <button @click="toggleSortMode('flash')" 
+                                        :class="filters.activeSortMode === 'flash' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
+                                        class="rounded-lg flex items-center w-full justify-center py-2 h-[30px] transition-all">
+                                    <i class="fa-solid fa-bolt"></i>
+                                </button>
+                                <span class="tooltip-text">Démarrage rapide</span>
+                            </div>
+                            <!-- Botón Fav -->
+                            <div class="has-tooltip">
+                                <button @click="toggleSortMode('fav')" 
+                                        :class="filters.activeSortMode === 'fav' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
+                                        class="rounded-lg flex items-center w-full justify-center py-2 h-[30px] transition-all">
+
+                                    <!-- Si el usuario NO ha votado nada: Corazón -->
+                                    <i class="fa-solid fa-heart"></i>
+                                    
+                                    
+                                </button>
+                                <span class="tooltip-text">Meilleures adaptations</span>
+                            </div>                                
+                            <!-- Botón New -->
+                            <div class="has-tooltip">
+                                <button @click="toggleSortMode('new')" 
+                                        :class="filters.activeSortMode === 'new' ? 'bg-indigo-950 text-white shadow-sm' : 'text-slate-400'"
+                                        class="rounded-lg flex items-center w-full justify-center py-2 h-[30px] transition-all">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                </button>
+                                <span class="tooltip-text">Nouveautés</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+
+<!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        RESULTATS
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+    
+    <!-- 4. RÉSULTATS JEUX -->
+    <div v-if="!loading" id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+       
+        <div v-for="game in filteredGames" :key="game.id" 
+             :id="'game-' + game.id" 
+             @click="toggleExpand(game.id)"
+             class="bg-white rounded-[2rem] border-2 border-slate-200 overflow-hidden cursor-pointer hover:border-indigo-400 transition-all shadow-sm"
+             :class="{'ring-4 ring-indigo-500/20 border-indigo-500 shadow-xl': expandedId === game.id}">
+            
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex-1">
+                        <h2 class="text-lg font-black text-slate-900 leading-tight uppercase"> {{ game.name }}</h2>
+                        <p class="text-s text-slate-300 font-bold mt-1 uppercase">{{ game.origin }} <span v-if="game.year"> ({{ game.year }})</span></p>
+                    </div>
+                    <!--<div class="text-s font-black text-slate-300">#{{ game.rankingBGG }}</div>-->
+                    <div class="text-lg font-black text-slate-900 leading-tight uppercase"><h2>
+                        <span v-if="game.isNew"><span class="text-indigo-600"><i class="fa-solid fa-wand-magic-sparkles"></i></span></span> 
+                        <span v-if="game.isFlash">⚡</span> 
+                        <span v-if="game.heart">❤️</span> 
+                        <span v-if="userVotes[game.name]">
+                            {{ {1:'😫', 2:'🙁', 3:'🙂', 4:'😍'}[userVotes[game.name]] }}   
+                        </span>
+                    </h2></div>
+
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-2">
+                    <div class="attr-pill"><i class="fa-solid fa-users text-indigo-300"></i> {{ game.nbPersonnes }}</div>
+                    <div class="attr-pill"><i class="fa-solid fa-cake-candles text-indigo-300"></i> {{ game.ageMin }}+</div>
+                    <div class="attr-pill"><i class="fa-solid fa-box text-indigo-300"></i> {{ game.config }}</div>
+                </div>
+
+                <!-- Pastillas de Categorías BGG -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span v-if="game.catBGG.Famille" class="cat-pill">
+                        <i class="fa-solid fa-people-group"></i> Famille
+                    </span>
+                    <span v-if="game.catBGG.Party" class="cat-pill">
+                        <i class="fa-solid fa-masks-theater"></i> Party
+                    </span>
+                    <span v-if="game.catBGG.Abstrait" class="cat-pill">
+                        <i class="fa-solid fa-chess-board"></i> Abstrait
+                    </span>
+                    <span v-if="game.catBGG.Stratégie" class="cat-pill">
+                        <i class="fa-solid fa-gears"></i> Stratégie
+                    </span>
+                </div>                
+
+                <p class="text-slate-600 text-s leading-relaxed" :class="expandedId === game.id ? '' : 'line-clamp-1'">{{ game.description }}</p>
+              
+                <div v-if="expandedId === game.id" class="mt-1 pt-2 gap-2 animate-fade-in">
+                    
+                    <p class="text-slate-600 text-s leading-relaxed">
+                        <!---<span v-if="(game.authors)">Un jeu {{ formatAuthors(game.authors) }}</span>-->
+                        <span v-if="(game.authors)"><b>Création : </b>{{ (game.authors) }}</span>
+                    </p>
+                    
+                    <!-- Feedback -->
+                    <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-end">
+                        <!-- Bloque de Votación -->
+                        <div class="flex flex-col gap-2">
+                            <span class="text-indigo-600 text-s font-bold">J'ai testé l'adaptation :</span>
+                            <div class="flex gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                                <button v-for="(emoji, val) in {1:'😫', 2:'🙁', 3:'🙂', 4:'😍'}" 
+                                        @click.stop="handleVote(game.name, parseInt(val))"
+                                        class="text-xl transition-all hover:scale-125"
+                                        :class="userVotes[game.name] == val ? 'grayscale-0 opacity-100' : 'grayscale opacity-30 hover:opacity-100'">
+                                    {{ emoji }}
+                                </button>
+                            </div>
+                        </div>
+                    
+                        <!-- Bloque de Resultados de Comunidad -->
+                        <div class="score-badge">
+                            <!-- USAMOS NUMBER() PARA ASEGURAR LA COMPARACIÓN MATEMÁTICA -->
+                            <template v-if="Number(game.communityCount) >= 5">
+                                <div class="flex flex-col items-end animate-fade-in">
+                                    <div class="community-avg-text">
+                                        {{ game.communityAvg }} <span class="text-xs text-slate-400 font-bold">/ 4</span>
+                                    </div>
+                                    <div class="community-count-text">
+                                        {{ game.communityCount }} votes
+                                    </div>
+                                    
+                                </div>
+                            </template>
+                        
+                            <!-- SI HAY MENOS DE 5 VOTOS (INCLUYENDO 1, 2, 3, 4) -->
+                            <template v-else>
+                                <div class="flex flex-col items-end text-right leading-tight">
+                                    <div class="community-avg-text text-slate-400">
+                                        {{ game.communityCount }} <span class="text-xs uppercase">vote{{ Number(game.communityCount) === 1 ? '' : 's' }}</span>
+                                    </div>
+                                    <!--
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase">
+                                        {{ game.communityCount }} {{ Number(game.communityCount) === 1 ? 'vote' : 'votes' }}
+                                    </span>
+                                    -->
+                                    <span class="text-xs text-slate-400 italic">Moyenne à 5 votes</span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2 mt-4">
+                        <p> 
+                            <span class="text-indigo-600 text-s font-bold">Fidélité au jeu d'origine : </span>
+                            <span class="text-slate-900 text-s font-black"> {{ game.fidelityScore }} </span>
+                            <span class="text-xs text-slate-400 font-black"> / 4</span>
+                        </p>                            
+                        <p class="text-slate-600 text-s leading-relaxed">
+                            {{ game.fidelityDetails }}
+                        </p>                        
+                    </div>    
+
+                    <div class="flex flex-col gap-2 mt-4">
+                        <!-- BOTÓN 1: EL MÁS IMPORTANTE -->
+                        <a :href="game.links.mobile" target="_blank" @click.stop 
+                           class="btn-mobile font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-mobile-screen-button opacity-70"></i> RÈGLES MOBILE
+                        </a>
+                    
+                        <div class="grid gap-2" :class="game.links.bgg ? 'grid-cols-2' : 'grid-cols-1'">
+                            <!-- BOTÓN 2: UTILIDAD (PDF) -->
+                            <a v-if="game.links.pdf" :href="game.links.pdf" target="_blank" @click.stop 
+                               class="btn-mobile font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2 shadow-sm">
+                                <i class="fa-solid fa-file-pdf opacity-70"></i> PDF
+                            </a>
+                    
+                            <!-- BOTÓN 3: EL MENOS IMPORTANTE (Solo si existe link) -->
+                            <a v-if="game.links.bgg" :href="game.links.bgg" target="_blank" @click.stop 
+                               class="btn-bgg font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2">
+                                <i class="fa-brands fa-fort-awesome opacity-50"></i>BGG <span v-if="(game.rankingBGG)"> #{{ game.rankingBGG }}</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        POPUPS
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+    <!-- POPUP AYUDA (?) -->
+    <div v-if="showHelpPopup" class="modal-overlay" @click.self="showHelpPopup = false">
+        <div class="modal-content animate-fade-in">
+            <button @click="showHelpPopup = false" class="absolute top-4 right-6 text-slate-400 hover:text-slate-900">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase">Filtres joueurs</h3>
+            <p>Sélectionnez une ou plusieurs configurations. Les jeux idéaux pour le plus grand nombre d'entre elles apparaissent en premier.</p>
+            
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Matériel</h3>
+            <p><b>Micro</b> = Papier et stylo (ou même rien)</p>
+            <p><b>Mini</b> = Micro + 1 jeu de 52 cartes</p>
+            <p><b>Standard</b> = Mini + 1 jeu extra, 10 jetons, 5 dés (ou <a href = "https://play.google.com/store/apps/details?id=fr.sevenpixels.dice" class="text-indigo-600 underline">appli</a>), quelques feuilles imprimées</p>
+            <p><b>Maxi</b> = Standard + matériel additionnel ou spécial</p>
+
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Recherche textuelle</h3>
+            <p>Titre, auteur, année, mécanique, catégorie BGG…</p>
+            <p class="text-slate-500"><i>Ex : "party", "dés", "plis", "Knizia", "2019", "coopératif"</i></p>
+
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Priorité</h3>
+            <p><b>⚡</b> = rapide à expliquer et à jouer</p>
+            <p><b>❤️</b> = meilleures adaptations (d'abord vos favoris, ensuite ceux de la communauté)</p>
+            <p><b><span class="text-indigo-600"><i class="fa-solid fa-wand-magic-sparkles"></span></i></b> = les nouveautés d'abord</p>
+
+        </div>
+    </div>
+
+    <!-- POPUP INFO (i) -->
+    <div v-if="showInfoPopup" class="modal-overlay" @click.self="showInfoPopup = false">
+        <div class="modal-content animate-fade-in">
+            <button @click="showInfoPopup = false" class="absolute top-4 right-6 text-slate-400 hover:text-slate-900">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase">À propos des adaptations</h2>
+            <p class="mt-4">La plupart des jeux sont des adaptations de titres publiés, rendues jouables avec du matériel courant.</p>
+            <p class="mt-4">Règles, illustrations et éléments protégés sont recréés ; le jeu original est toujours cité.</p>
+            <p class="mt-4">Ce projet n'est pas un substitut: il encourage à découvrir les œuvres de leurs auteurs.</p>
+
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Un bug ou une idée?</h2>
+            <button @click="openContactForm" class="w-auto btn-action-secondary py-3 rounded-xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-paper-plane text-indigo-500"></i>
+                Me contacter
+            </button>
+            
+            
+        </div>
+    </div>
+
+    <div v-if="showFeedbackModal" class="modal-overlay" @click.self="showFeedbackModal = false">
+        <div class="modal-content">
+            <h2 class="text-xl font-black uppercase text-slate-900 mb-2 text-center">
+                {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Me contacter' : 'Feedback sur l\'adaptation' }}
+            </h2>
+            <p class="text-xs text-rose-600 font-bold mb-6 text-center uppercase tracking-tighter">
+                {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Dites-moi tout !' : 'Qu\'est-ce qui ne vous a pas convaincu ?' }}                
+            </p>
+            
+            <div v-if="currentFeedback.gameId !== 'SITE_GLOBAL'" class="space-y-2 mb-6">
+                <!-- Usamos keys para mapear a las columnas del Excel -->
+                <label class="check-card">
+                    <input type="checkbox" v-model="currentFeedback.issues.material">
+                    <span>Matériel peu pratique à manipuler</span>
+                </label>
+                <label class="check-card">
+                    <input type="checkbox" v-model="currentFeedback.issues.prep">
+                    <span>Préparation trop longue ou fastidieuse</span>
+                </label>
+                <label class="check-card">
+                    <input type="checkbox" v-model="currentFeedback.issues.rules">
+                    <span>Règles confuses ou incomplètes</span>
+                </label>
+                <label class="check-card">
+                    <input type="checkbox" v-model="currentFeedback.issues.exp">
+                    <span>L'adaptation dénature l’esprit du jeu original</span>
+                </label>
+                <label class="check-card">
+                    <input type="checkbox" v-model="currentFeedback.issues.game">
+                    <span>Simple question de goût (le jeu ne m’a pas plu)</span>
+                </label>
+            </div>
+
+            <textarea v-model="currentFeedback.comment" 
+                      :placeholder="currentFeedback.gameId === 'SITE_GLOBAL' ? 'Votre message...' : 'Plus de détails (facultatif)...'"
+                      class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl text-sm mb-4 h-24 outline-none focus:border-indigo-500"></textarea>
+    
+            <button @click="submitDetailedFeedback" :disabled="isSending"
+                    class="btn-mobile w-full py-4 rounded-2xl uppercase font-black tracking-widest shadow-lg disabled:opacity-50">
+                {{ isSending ? 'Envoi...' : 'Envoyer' }}
+            </button>
+        </div>
+    </div>
+    
+<!--
+    <div v-if="showCommentModal" class="modal-overlay" @click.self="showCommentModal = false">
+        <div class="modal-content">
+            <h2 class="text-xl font-black uppercase mb-4">Feedback : {{ activeFeedbackGame || 'Site' }}</h2>
+            <textarea v-model="commentText" 
+                      placeholder="Qu'est-ce qui ne va pas ? Une erreur de règle, un lien mort..."
+                      class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl text-sm mb-4 h-32 focus:border-indigo-500 outline-none"></textarea>
+            <div class="flex gap-2">
+                <button @click="showCommentModal = false" class="btn-bgg flex-1 py-3 rounded-xl uppercase font-bold">Annuler</button>
+                <button @click="sendFeedback(activeFeedbackGame || 'SITE', 'COMMENT', commentText)" 
+                        :disabled="!commentText || isSending"
+                        class="btn-mobile flex-1 py-3 rounded-xl uppercase font-bold disabled:opacity-50">
+                    {{ isSending ? 'Envoi...' : 'Envoyer' }}
+                </button>
+            </div>
+        </div>
+    </div>
+-->
+    
+</div>
+
+<!-- ############################################################################################################################################## -->
+<!-- ##                                                                                                                                          ## -->
+<!-- ##                                                                JAVASCRIPT                                                                ## -->    
+<!-- ##                                                                                                                                          ## -->    
+<!-- ############################################################################################################################################## -->    
+    
+<script>
+const { createApp } = Vue
+
+createApp({
+    data() {
+
+        // 1. Detección automática del entorno
+        const host = window.location.hostname;
+        const path = window.location.pathname;
+        let env = 'PROD'; 
+        
+        if (path.includes('-test')) {
+            env = 'TEST';
+        } else if (path.includes('-prex')) {
+            env = 'PRE';
+        }
+    
+        // Console log informativo para el desarrollador
+        console.log(`%c [P52] Environnement détecté : ${this.env} `, 'background: #1e1b4b; color: #fff; font-weight: bold;');
+        console.log(`[P52] Path actual : ${host}${path}`);
+        
+        // Recuperamos sus votos anteriores para iluminar los emojis
+        console.log('Clé lue:', `rkf_user_votes_${this.env}`);
+        console.log('Valeur lue:', localStorage.getItem(`rkf_user_votes_${this.env}`));
+        
+    
+        // 2. Diccionario de URLs por entorno
+        const configs = {
+            PROD: {
+                userSyncUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLzY0YREy8dl8jWKwb94f_l8HNOGnMKcJcxsNjzaR0B3Awc3Nkgf4yvj-ncnL9ei7Wvm7_VaztaV63/pub?gid=1837404950&single=true&output=csv",                                
+                sheetUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv",
+                votesUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLzY0YREy8dl8jWKwb94f_l8HNOGnMKcJcxsNjzaR0B3Awc3Nkgf4yvj-ncnL9ei7Wvm7_VaztaV63/pub?gid=684535740&single=true&output=csv",
+                scriptUrl: "https://script.google.com/macros/s/AKfycbwKzClBnj6FJmSEiHK4NSxN8cG1E_20Z0Pleo_h_D7A8_VjLdVpD-TdcHAGrlTS5w1u/exec"                
+            },
+            PRE: {
+                // Usa la misma hoja de juegos que PROD pero escribe en la base de test
+                userSyncUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNnvBMKv6MUB7e-UlrR6ZTLi4nFqBy4I-yr0xbTFUHu4dWLsZkk2-BvITb8mVkp-ZQ9u-J-D9YGMDj/pub?gid=1775487374&single=true&output=csv",                
+                sheetUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv",
+                votesUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQNnvBMKv6MUB7e-UlrR6ZTLi4nFqBy4I-yr0xbTFUHu4dWLsZkk2-BvITb8mVkp-ZQ9u-J-D9YGMDj/pub?gid=684535740&single=true&output=csv", 
+                scriptUrl: "https://script.google.com/macros/s/AKfycbzOYCeYCMxaOvqODTfyJ3Tg05yZZSays_dPV3mx2VxBD64nht-Znggom68PsiOHjZcI4A/exec"
+            },
+            TEST: {
+                // Totalmente independiente
+                userSyncUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMFoxcPpSW3pfMGJCgKpROicS4abpVjV9POlF8afNOWmbdAgCVxzLCwxqNxiznxLQ7kQJ3ehiEcHQi/pub?gid=470067532&single=true&output=csv",
+                sheetUrl:    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQiSGJxvRlizw98U7hsFPScVZv7YKL9a-lL1AuXMfGhUz1oCl6Eb7SVSsTOdRIDHQy4ORsseMTkf6YH/pub?gid=0&single=true&output=csv",
+                votesUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMFoxcPpSW3pfMGJCgKpROicS4abpVjV9POlF8afNOWmbdAgCVxzLCwxqNxiznxLQ7kQJ3ehiEcHQi/pub?gid=684535740&single=true&output=csv",
+                scriptUrl: "https://script.google.com/macros/s/AKfycbzauLQCfTAQXbbBmVS4Y0zVA8df__2bqcVeLIyyDFXfNr1DIn6APINP8JYYz-Mr0ZGp2Q/exec"
+            }
+        };
+        
+        return {
+            env: env, 
+            config: configs[env], // Inyectamos la config activa
+            loading: true,
+            expandedId: null,
+            showExtra: false,
+            showLegend: false,
+            showRange6to10: false,  
+            showRange11to20: false,             
+            showInfoPopup: false,
+            showHelpPopup: false,            
+            selectedPlayers: [],
+            sortBy: 'ideal',
+            searchQuery: '', 
+            games: [],
+            categories: [
+                { name: "Famille", label: "Famille", icon: "fa-solid fa-people-group" },
+                { name: "Party", label: "Party", icon: "fa-solid fa-masks-theater" },
+                { name: "Abstrait", label: "Abstrait", icon: "fa-solid fa-chess-board" },
+                { name: "Stratégie", label: "Stratégie", icon: "fa-solid fa-gears" }
+            ],
+            showFeedbackModal: false,
+            isSending: false,
+            // Estructura de issues por clave para el mapeo a columnas
+            currentFeedback: { 
+                gameId: null, 
+                rating: null, 
+                issues: { material: false, prep: false, rules: false, exp: false, game: false }, 
+                comment: '' 
+            },            
+            filters: {
+                age: 99, 
+                material: 4, 
+                activeSortMode: 'default', // 'default', 'new', 'fav', 'flash'
+            },
+            
+            // Recuperamos el ID del usuario o creamos uno nuevo
+            visitorId: localStorage.getItem('rkf_user_id') || 'user_' + Math.random().toString(36).substr(2, 9),
+            userVotes: JSON.parse(localStorage.getItem(`rkf_user_votes_${env}`) || '{}'),
+            voteTimestamps: JSON.parse(localStorage.getItem(`rkf_vote_ts_${env}`) || '{}'),
+
+            showCommentModal: false,
+            activeFeedbackGame: null,
+            commentText: ''
+        }
+    },
+    mounted() { 
+        localStorage.setItem('rkf_user_id', this.visitorId);
+        this.fetchData(); 
+    },
+    computed: {
+        filteredGames() {
+            const searchTerms = this.getLabels(this.searchQuery);
+            return this.games.filter(game => {
+    
+                // --- 1. FILTRO DE TEXTO (Lógica de Pertenencia) ---
+                if (searchTerms.length > 0) {
+                    // CADA término buscado por el usuario...
+                    const matchSearch = searchTerms.every(term => {
+                        // ...debe estar contenido en AL MENOS UNA de las etiquetas del juego
+                        return game.labels.some(label => label.includes(term));
+                    });
+                    if (!matchSearch) return false;
+                }
+    
+                // --- 2. RESTO DE FILTROS ---
+                // (Aquí mantienes tu lógica actual de jugadores, edad, material, etc.)
+                
+                const matchPlayer = this.selectedPlayers.length === 0 || this.selectedPlayers.every(p => game.players[p] && !game.players[p].includes('🔴'));
+                const matchAge = game.ageMin <= this.filters.age;
+                const configRank = { 'Mini': 1, 'Standard': 2, 'Maxi': 3 };
+                const matchMaterial = game.configLevel <= this.filters.material;
+                return matchPlayer && matchAge && matchMaterial;
+            }).sort((a, b) => {
+                const mode = this.filters.activeSortMode;
+
+                // 1. MODO NEW: Estrictamente por fecha
+                if (mode === 'new') {
+                    return b.dateAdded - a.dateAdded;
+                }
+        
+                // 2. MODO FAV: Jerarquía por Tiers (Niveles)
+                if (mode === 'fav') {
+                    const getFavWeight = (g) => {
+                        const visitorVote = parseInt(this.userVotes[g.name]) || null;
+                        const hasHeart = g.heart;
+                        let points = 0;
+                
+                        // --- PRIORIDAD 1: DETERMINAR EL TIER (EL BLOQUE PRINCIPAL) ---
+                        if (visitorVote === 4) points = 10000;      // Tier 1: Mi 4/4
+                        else if (visitorVote === 3) points = 8000;  // Tier 2: Mi 3/4
+                        else if (hasHeart && !visitorVote) points = 6000; // Tier 3: Corazón (y no lo he votado)
+                        else if (!visitorVote) points = 4000;       // Tier 4: Sin voto ni corazón (neutral)
+                        else if (visitorVote === 2) points = 2000;  // Tier 5: Mi 2/4 (descartado sutil)
+                        else if (visitorVote === 1) points = 0;     // Tier 6: Mi 1/4 (descartado absoluto)
+                
+                        // --- PRIORIDAD 2: CORAZÓN COMO DESEMPATE (Solo en Tier 1 y 2) ---
+                        // Si el usuario votó 3 o 4, el hecho de que tú también lo recomiendes le da un extra
+                        if ((visitorVote === 4 || visitorVote === 3) && hasHeart) {
+                            points += 500;
+                        }
+                
+                        // --- PRIORIDAD 3: NOTA HÍBRIDA (COMUNIDAD O AUTOR) ---
+                        // Calculamos nota en escala 0-4
+                        const communityWeight = (parseInt(g.communityCount) >= 5)
+                            ? parseFloat(g.communityAvg)
+                            : (parseFloat(g.scoreRKF) / 2.5);
+                        
+                        points += (communityWeight * 10); // Multiplicamos para que pese más que el BGG pero menos que el corazón
+                
+                        return points;
+                    };
+                
+                    const weightA = getFavWeight(a);
+                    const weightB = getFavWeight(b);
+                
+                    // Si los pesos (Tiers + Corazón + Nota) son distintos, ordenamos por peso
+                    if (weightB !== weightA) return weightB - weightA;
+                
+                    // --- PRIORIDAD 4: RANKING BGG (DESEMPATE FINAL) ---
+                    const bggA = parseInt(a.rankingBGG) || 30000;
+                    const bggB = parseInt(b.rankingBGG) || 30000;
+                    return bggA - bggB;
+                }
+                
+                // 3. MODO FLASH: Rayo > Tiempo (Express > Courant > Long)
+                if (mode === 'flash') {
+                    if (a.isFlash !== b.isFlash) return b.isFlash ? 1 : -1;
+                    const timeMap = { '1-Express': 1, '2-Courant': 2, '3-Long': 3 };
+                    const timeA = timeMap[a.timeStart] || 3;
+                    const timeB = timeMap[b.timeStart] || 3;
+                    if (timeA !== timeB) return timeA - timeB;
+                    return (parseInt(a.rankingBGG) || 30000) - (parseInt(b.rankingBGG) || 30000);
+                }          
+                
+                // 4. MODO DEFAULT: número de verdes (🟢) > Weighted Rank
+                // A. Contamos solo los verdes (🟢) para la selección actual
+                const getGreenCount = (game) => {
+                    if (this.selectedPlayers.length === 0) return 0;
+                    return this.selectedPlayers.reduce((acc, p) => 
+                        acc + (game.players[p] && game.players[p].includes('🟢') ? 1 : 0), 0);
+                };
+        
+                const greensA = getGreenCount(a);
+                const greensB = getGreenCount(b);
+        
+                // B. Criterio Primario: Más verdes arriba
+                if (greensB !== greensA) {
+                    return greensB - greensA;
+                }
+        
+                // C. Criterio Secundario: Ranking BGG Ponderado
+                const getWeightedRank = (game) => {
+                    // 1. Base del ranking (1 a 30,000)
+                    let virtualRank = parseInt(game.rankingBGG) || 30000;
+                
+                    // 2. Ajuste por Nota RKF (Lineal entre -15,000 y +15,000)
+                    // Nota 10 -> -15,000 | Nota 5 -> 0 | Nota 0 -> +15,000
+                    // Fórmula: (5 - nota) * 3000
+                    const noteAjuste = (5 - game.scoreRKF) * 2000;
+                    virtualRank += noteAjuste;
+                
+                    // 3. Ajuste por Novedad (Solo si tiene menos de 90 días)
+                    const today = new Date();
+                    const diffMs = today - game.dateAdded;
+                    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+                
+                    if (diffDays >= 0 && diffDays <= 90) {
+                        // Bono de -10,000 (hoy) bajando hasta 0 (a los 90 días)
+                        const noveltyBono = (1 - (diffDays / 90)) * 10000;
+                        virtualRank -= noveltyBono;
+                    }                
+                    return virtualRank;
+                    
+                };
+        
+                return getWeightedRank(a) - getWeightedRank(b);
+            });
+        }
+    },
+    methods: {
+
+        async syncUserVotesFromCloud() {
+            if (!this.config.userSyncUrl) return;
+
+            // Añadimos un timestamp para evitar que el navegador o Google usen una versión vieja (Caché)
+            const urlConCacheBuster = this.config.userSyncUrl + "&t=" + Date.now();            
+            
+            try {
+                const response = await fetch(urlConCacheBuster, {
+                    method: 'GET',
+                    // Importante: No usamos 'no-cors' aquí porque queremos LEER el contenido
+                    mode: 'cors', 
+                    cache: 'no-store'
+                });
+        
+                if (!response.ok) throw new Error("Error en respuesta de Google");
+                
+                const csvText = await response.text();
+                
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        let hasChanges = false;
+                        const DIEZ_MINUTOS = 10 * 60 * 1000; // 600,000 ms
+
+                        
+                        results.data.forEach(row => {
+                            // Verificamos si la fila pertenece al usuario actual
+                            // Nota: Los nombres de las columnas dependen del LABEL de tu QUERY
+                            if (row.User === this.visitorId) {
+                                const gameName = row.Game;
+                                const cloudRating = parseInt(row.Vote);
+
+                                // --- EL ESCUDO ---
+                                const lastLocalVoteTime = this.voteTimestamps[gameName] || 0;
+                                const esReciente = (Date.now() - lastLocalVoteTime) < DIEZ_MINUTOS;
+
+                                // SOLO sincronizamos si NO es reciente Y el valor es distinto
+                                if (!esReciente && this.userVotes[gameName] !== cloudRating) {
+                                    this.userVotes[gameName] = cloudRating;
+                                    hasChanges = true;
+                                    console.log(`[Sync] Actualizado ${gameName} desde la nube.`);
+                                }
+                               
+                            }
+                        });
+        
+                        if (hasChanges) {
+                            console.log("[P52] Votos sincronizados con la nube (Historial recuperado)");
+                            localStorage.setItem(`rkf_user_votes_${this.env}`, JSON.stringify(this.userVotes));
+                        }
+                    }
+                });
+            } catch (e) {
+                console.warn("Sincronización de historial no disponible.");
+            }
+        },        
+        
+        formatAuthors(authorsText) {
+            if (!authorsText) return '';
+            
+            const authors = authorsText.split(',').map(a => a.trim()).filter(a => a.length > 0);
+            
+            if (authors.length === 0) return '';
+            if (authors.length === 1) {
+                // Gérer le "d'" pour les voyelles
+                const firstChar = authors[0].toLowerCase().charAt(0);
+                return ['a', 'e', 'i', 'o', 'u', 'h'].includes(firstChar) ? `d'${authors[0]}` : `de ${authors[0]}`;
+            }
+            
+            // Gérer les multiples auteurs avec "et" à la fin
+            const lastAuthor = authors.pop(); // Prend le dernier
+            return `de ${authors.join(', ')} et ${lastAuthor}`;
+        },        
+        
+        openContactForm() {
+            // Cerramos la popup de info primero
+            this.showInfoPopup = false;
+            
+            // Preparamos el formulario de feedback para el SITIO
+            this.currentFeedback = { 
+                gameId: "SITE_GLOBAL", 
+                rating: 0, // Nota neutra para mensajes
+                issues: { material: false, prep: false, rules: false, loyalty: false, taste: false }, 
+                comment: '' 
+            };
+            
+            // Abrimos el modal de feedback que ya tienes
+            setTimeout(() => {
+                this.showFeedbackModal = true;
+            }, 300); 
+        },
+        
+        toggleRange6to10() {
+            this.showRange6to10 = !this.showRange6to10;
+            if (!this.showRange6to10) {
+                this.showRange11to20 = false; // Cerramos el siguiente rango también
+                this.selectedPlayers = this.selectedPlayers.filter(n => n <= 5);
+            }
+        },
+        toggleRange11to20() {
+            this.showRange11to20 = !this.showRange11to20;
+            if (!this.showRange11to20) {
+                this.selectedPlayers = this.selectedPlayers.filter(n => n <= 10);
+            }
+        },
+        toggleSortMode(mode) {
+            if (this.filters.activeSortMode === mode) {
+                this.filters.activeSortMode = 'default';
+            } else {
+                this.filters.activeSortMode = mode;
+            }
+
+            // 2. Ejecutamos el scroll
+            // Usamos un pequeño retraso para que a Vue le dé tiempo a reordenar las fichas
+            setTimeout(() => {
+                const resultsEl = document.getElementById('results-container');
+                const filterEl = document.getElementById('filter-section');
+        
+                if (resultsEl && filterEl) {
+                    // Posición real del contenedor de juegos desde el techo de la web
+                    const containerTop = resultsEl.getBoundingClientRect().top + window.pageYOffset;
+                    
+                    // Altura de la barra de filtros (que está flotando)
+                    const headerHeight = filterEl.offsetHeight;
+        
+                    // Calculamos el punto exacto:
+                    // Queremos que el inicio del contenedor coincida con el final de la barra
+                    // Restamos un poco más (ej. 16px) para que no esté pegado al borde
+                    const finalPos = containerTop - headerHeight - 16;
+        
+                    window.scrollTo({
+                        top: finalPos,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 50); // 50 milisegundos son suficientes
+            
+        },
+        toggleExpand(id) {
+            if (this.expandedId === id) {
+                this.expandedId = null;
+            } else {
+                this.expandedId = id;
+                // Este bloque hace que la pantalla se desplace a la ficha
+                //setTimeout(() => {
+                //    const el = document.getElementById('game-' + id);
+                //    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                //}, 100);
+                setTimeout(() => {
+                    const card = document.getElementById('game-' + id);
+                    const header = document.getElementById('filter-section');
+                    
+                    if (card && header) {
+                        // 1. Medimos cuánto mide la barra de filtros ahora mismo
+                        const headerHeight = header.offsetHeight;
+                        
+                        // 2. Calculamos la posición de la ficha respecto al total de la página
+                        // Añadimos 16px extra de "aire" (gap) para que no esté pegada
+                        const topOffset = card.getBoundingClientRect().top + window.pageYOffset - headerHeight - 16;
+        
+                        // 3. Movemos la pantalla a esa posición exacta
+                        window.scrollTo({
+                            top: topOffset,
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 100);
+            }
+        },        
+        saveLocalVote(gameId, val) {
+            this.userVotes[gameId] = val;
+            this.voteTimestamps[gameId] = Date.now(); 
+            console.log('Clé écrite:', `rkf_user_votes_${this.env}`);
+            localStorage.setItem(`rkf_user_votes_${this.env}`, JSON.stringify(this.userVotes));
+            localStorage.setItem(`rkf_vote_ts_${this.env}`, JSON.stringify(this.voteTimestamps));
+        },        
+        async fetchData() {
+            try {
+                    // 1. Cargamos los juegos inmediatamente
+                    const response = await fetch(this.config.sheetUrl);
+                    const csvText = await response.text();
+                    Papa.parse(csvText, {
+                        header: true, skipEmptyLines: true,
+                        complete: (results) => {
+                            this.games = results.data.filter(row => row.Nom_Adaptation).map((row, index) => {
+                                const year = row.Annee || ""; // Asegúrate que en Excel es "Annee" sin tilde
+                                const author = row.Auteur || "";
+                                const rawLabels = row.Labels || "";
+                                
+                                // Construimos el ADN del juego: una lista de todas sus etiquetas posibles
+                                const gameLabels = [
+                                    ...this.getLabels(row.Nom_Adaptation),
+                                    ...this.getLabels(row.Jeu_Origine),
+                                    ...this.getLabels(author),
+                                    ...this.getLabels(rawLabels)
+                                ];             
+                                
+                                const gameName = row.Nom_Adaptation;
+                                // Miramos si el usuario ya tiene un voto guardado para este juego
+                                const myLocalVote = this.userVotes[gameName] || null;
+                                                                                   
+                                return {
+                                    id: index, name: gameName, description: row.Description, origin: row.Jeu_Origine, ageMin: parseInt(row.Age_Min) || 0, 
+                                    author: author, labels: gameLabels,
+                                    configLevel: row.Config_materiel ? (parseInt(row.Config_materiel.charAt(0)) || 4) : 4,
+                                    config: row.Config_materiel ? (row.Config_materiel.includes('-') ? row.Config_materiel.split('-')[1] : row.Config_materiel) : 'Maxi',
+                                    nbPersonnes: row.Nb_personnes, timeStart: row.Temps_avant_demarrage || '3-Long', rankingBGG: row.Ranking_BGG || 'N/A',
+                                    scoreRKF: parseFloat(row.Note_RKF) || 5,
+                                    isFlash: row.Flash52 !== "",
+                                    isNew: row.New !== "", heart: row.Favori !== "", 
+                                    dateAdded: row.Date_Publication ? new Date(row.Date_Publication) : new Date("1900-01-01"),
+                                    fidelityScore: this.parseFidelity(row.Fidelite),
+                                    fidelityDetails: row.Details_Fidelite, catBGG: { Famille: row.Famille !== "", Party: row.Party !== "", Abstrait: row.Abstrait !== "", Stratégie: row.Stratégie !== "" },
+                                    players: this.extractPlayers(row), links: { mobile: row.Lien_Regles_Mobiles, pdf: row.Lien_PDF, bgg: row.Lien_BGG },
+                                    // Valores por defecto (se actualizarán en el Paso 2)
+                                    year: row.Annee || "",      // Captura la columna Annee
+                                    authors: row.Auteur || "",   // Captura la columna Auteur
+            
+                                    communityAvg: myLocalVote ? myLocalVote.toFixed(1) : "0.0", //statsComunidad[gameName]?.avg || "0.0",
+                                    communityCount: myLocalVote ? 1 : 0, //statsComunidad[gameName]?.count || 0,                                                                        
+                                    isVoteSynced: false // Indica si hemos recibido datos del servidor
+                                }
+                                                                                            
+                            });
+                            this.loading = false;
+
+                            // Recalcul isFlash : les 6 jeux avec la date de publication la plus récente
+                            const sorted = [...this.games]
+                                .filter(g => g.dateAdded > new Date("1900-01-02")) // exclure les jeux sans date
+                                .sort((a, b) => b.dateAdded - a.dateAdded)
+                                .slice(0, 6)
+                                .map(g => g.id);
+                            
+                            this.games.forEach(g => {
+                                g.isNew = sorted.includes(g.id);
+                            });                                    
+
+                            // --- PASO 2: CARGAR VOTOS EN SEGUNDO PLANO ---
+                            this.fetchCommunityVotes(this.config.votesUrl);
+                            this.syncUserVotesFromCloud(); // <--- Sincroniza los votos del usuario
+                        }
+                    });                
+              
+            } catch(e) { alert("Erreur de synchronisation."); this.loading = false; }
+        },
+                
+        async fetchCommunityVotes(url) {
+            try {
+                const response = await fetch(url);
+                const csvText = await response.text();
+                
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true, // Evita procesar filas vacías al final
+                    complete: (results) => {
+                        // DEBUG: Si quieres saber por qué falla, mira esto en la consola (F12)
+                        console.log("Cabeceras detectadas:", results.meta.fields);
+        
+                        results.data.forEach(row => {
+                            // MEJORA 1: No dependemos de "Col2". 
+                            // Usamos la primera columna que devuelva el CSV sea cual sea su nombre.
+                            const rawName = row[results.meta.fields[0]]; 
+                            if (!rawName) return;
+        
+                            const gameName = rawName.trim();
+                            const serverAvg = parseFloat(row["Media"]) || 0;
+                            const serverCount = parseInt(row["Total"]) || 0;
+                            
+                            // MEJORA 2: Usamos trim() para comparar sin miedo a los espacios invisibles
+                            const game = this.games.find(g => g.name.trim() === gameName);
+                            
+                            if (game) {
+                                const myLocalVote = this.userVotes[game.name];
+                                
+                                // TU LÓGICA DE PERSISTENCIA (Mantenida):
+                                if (myLocalVote && serverCount === 0) {
+                                    game.communityAvg = myLocalVote.toFixed(1);
+                                    game.communityCount = 1;
+                                } else {
+                                    game.communityAvg = serverAvg.toFixed(1);
+                                    game.communityCount = serverCount;
+                                }
+                                game.isVoteSynced = true;
+                            }
+                        });
+                    }
+                });
+            } catch (e) {
+                console.warn("Error en la sincronización:", e);
+            }
+        },  
+
+        
+        async handleVote(gameId, val) {
+
+            const oldRating = this.userVotes[gameId];
+            if (oldRating === val) return; // Si vota lo mismo, no hacemos nada            
+            
+            // Resetear formulario
+            this.currentFeedback = { 
+                gameId: gameId, 
+                rating: val, 
+                issues: { material: false, prep: false, rules: false, exp: false, game: false }, 
+                comment: '' 
+            };
+            
+            if (val >= 3) { // 🙂 y 😍 son directos
+                this.updateLocalStats(gameId, val); // <--- Recalcular ahora
+                this.saveLocalVote(gameId, val);    // <--- Guardar emoji
+                await this.sendToGoogle(this.currentFeedback);
+            } else { // 😫 y 🙁abren feedback
+                this.currentFeedback = { 
+                    gameId: gameId, rating: val, 
+                    issues: { material: false, prep: false, rules: false, exp: false, hook: false }, 
+                    comment: '' 
+                };                
+                this.showFeedbackModal = true;
+            }
+        },
+        
+        async submitDetailedFeedback() {
+            this.isSending = true;
+            this.updateLocalStats(this.currentFeedback.gameId, this.currentFeedback.rating);
+            this.saveLocalVote(this.currentFeedback.gameId, this.currentFeedback.rating);            
+            this.sendToGoogle(this.currentFeedback);
+
+            setTimeout(() => {
+                this.isSending = false;
+                this.showFeedbackModal = false;
+                // Limpiamos el formulario para la próxima
+                this.currentFeedback = { 
+                    gameId: null, rating: null, 
+                    issues: { material: false, prep: false, rules: false, loyalty: false, taste: false }, 
+                    comment: '' 
+                };
+            }, 100); // 100ms es imperceptible pero da tiempo a que el ojo vea el clic
+        },
+        
+        async sendToGoogle(payload) {
+            const URL = this.config.scriptUrl;
+            // Construimos el objeto final
+            const finalData = {
+                userId: this.visitorId,
+                ...payload
+            };
+        
+            try {
+                fetch(URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Google Apps Script requiere esto desde GitHub
+                    headers: { 'Content-Type': 'text/plain' }, // Evita problemas de seguridad
+                    body: JSON.stringify(finalData)
+                });
+            } catch (e) {
+                console.warn("Envío de fondo fallido (se reintentará en el próximo refresh)", e);
+            }
+        },        
+
+        updateLocalStats(gameName, newRating) {
+            // 1. Buscamos el juego en nuestra lista local
+            const game = this.games.find(g => g.name === gameName);
+            if (!game) return;
+        
+            // 2. Miramos si el usuario ya había votado antes por este juego
+            const oldRating = this.userVotes[gameName];
+        
+            // Convertimos los valores actuales a números para operar
+            let currentAvg = parseFloat(game.communityAvg) || 0;
+            let currentCount = parseInt(game.communityCount) || 0;
+            let totalScore = currentAvg * currentCount;
+        
+            if (oldRating) {
+                // CASO A: El usuario está CAMBIANDO su voto
+                // Restamos la nota vieja y sumamos la nueva. El contador no cambia.
+                totalScore = totalScore - oldRating + newRating;
+            } else {
+                // CASO B: El usuario está votando por PRIMERA VEZ
+                // Sumamos la nota y aumentamos el contador.
+                totalScore = totalScore + newRating;
+                currentCount++;
+            }
+        
+            // 3. Calculamos la nueva media y actualizamos el objeto
+            game.communityCount = currentCount;
+            game.communityAvg = currentCount > 0 ? (totalScore / currentCount).toFixed(1) : "0.0";
+        },
+        
+        extractPlayers(row) { let p = {}; for (let i = 1; i <= 21; i++) { if (row[i.toString()]) p[i] = row[i.toString()]; } return p; },
+        parseFidelity(text) { if (!text) return 0; if (text.includes("4")) return 4; if (text.includes("3")) return 3; if (text.includes("2")) return 2; return 1; },
+        togglePlayer(n) { const i = this.selectedPlayers.indexOf(n); if (i > -1) this.selectedPlayers.splice(i, 1); else this.selectedPlayers.push(n); },
+        toggleCat(name) { const i = this.filters.cats.indexOf(name); if (i > -1) this.filters.cats.splice(i, 1); else this.filters.cats.push(name); },
+        calculateScore(game) {
+            if (this.selectedPlayers.length === 0) return 0;
+            let score = 0;
+            this.selectedPlayers.forEach(p => { const status = game.players[p]; if (status?.includes('🟢')) score += 100; else if (status?.includes('🟡')) score += 10; });
+            return score;
+        },
+        normalize(text) {
+            if (!text) return "";
+            return text.toString().toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // 2. Quita acentos
+                .replace(/[^a-z0-9']/g, " ")                      // 1. Solo letras, números y el símbolo '
+                .replace(/([aeiou])s\b/g, "$1")                  // 4. Plurales: cartas -> carta
+                .replace(/([aeiou])x\b/g, "$1")                  // 4. Plurales: jeux -> jeu
+                .replace(/\s+/g, " ")                            // 5. Quita dobles espacios
+                .trim();
+        },        
+        getLabels(text) {
+            if (!text) return [];
+            const normalized = this.normalize(text);
+            
+            // Extraemos bloques entre '...'
+            const quotes = normalized.match(/'([^']+)'/g) || [];
+            const quotedLabels = quotes.map(l => l.replace(/'/g, ""));
+            
+            // Extraemos palabras fuera de las comillas
+            const remaining = normalized.replace(/'([^']+)'/g, " ");
+            const wordLabels = remaining.split(" ").filter(w => w.length > 0);
+            
+            return [...quotedLabels, ...wordLabels];
+        }
+        
+    }
+}).mount('#app')
+</script>
+</body>
+</html>
