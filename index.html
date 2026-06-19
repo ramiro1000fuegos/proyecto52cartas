@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projet 52 cartes - Catalogue de jeux à matériel simple</title>
+    <title>Proyecto 52 cartas - Catálogo de juegos con material simple</title>
 
     <!-- La descripción que aparece debajo del título en Google (máximo 155 caracteres) -->
     <meta name="description" content="Découvrez plus de 90 jeux de société adaptés pour jouer avec presque rien : un jeu de cartes standard, quelques dés et du matériel du quotidien.">
     
     <!-- Palabras clave para ayudar al buscador -->
-    <meta name="keywords" content="jeux de société, adaptations, matériel simple, cartes, dés, print and play, PnP, jeux gratuits">
+    <meta name="keywords" content="juegos de mesa, juegos de cartas, adaptaciones, material simple, cartas, dados, print and play, PnP, juegos gratuitos">
 
     <!-- Configuración para redes sociales (Open Graph) -->
-    <meta property="og:title" content="Projet 52 Cartes">
-    <meta property="og:description" content="Le catalogue ultime des adaptations de jeux à matériel réduit.">
-    <meta property="og:url" content="https://ramiro1000fuegos.github.io/projet52cartes/">
+    <meta property="og:title" content="Proyecto 52 cartas">
+    <meta property="og:description" content="El catálogo definitivo de adaptaciones de juegos de mesa con material simple.">
+    <meta property="og:url" content="https://ramiro1000fuegos.github.io/proyecto52cartas/">
     
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -297,10 +297,10 @@
           
             <div class="max-w-2xl">
                 <h1 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase leading-none mb-4">
-                    PROJET <span class="text-indigo-600">52 CARTES</span>
+                    PROYECTO <span class="text-indigo-600">52 CARTAS</span>
                 </h1>
                 <p class="text-lg font-bold text-slate-600 leading-tight">
-                    {{ filteredGames.length }} jeux adaptés au matériel du quotidien.  <!-- {{ games.length }} -->
+                    {{ filteredGames.length }} juegos adaptados al material que tienes en casa.  <!-- {{ games.length }} -->
                 </p>
             </div>
 
@@ -308,7 +308,7 @@
             <div v-if="env !== 'PROD'" 
                  class="fixed bottom-6 left-6 z-[10000] animate-pulse">
                 <div class="bg-amber-500 text-white text-[10px] font-black px-4 py-2 rounded-2xl shadow-2xl border-2 border-white uppercase tracking-tighter">
-                    🛠️ Mode {{ env }}
+                    🛠️ Modo {{ env }}
                 </div>
             </div>
             
@@ -331,7 +331,7 @@
                     <!-- Input -->
                     <input type="text" 
                            v-model="searchQuery" 
-                           placeholder="Jeu, auteur, année, catégorie, mécanique..." 
+                           placeholder="Juego, autor, año, categoría, mecánica..." 
                            class="w-full bg-slate-50 border-2 border-slate-100 py-2.5 pl-10 pr-10 rounded-xl text-xs font-bold outline-none focus:border-indigo-500 focus:bg-white transition-all shadow-sm">
                     
                     <!-- Botón de borrar (X) -->
@@ -359,7 +359,7 @@
                 
                 <!-- Joueurs -->
                 <div class="col-span-2 md:col-span-5">
-                    <h3 class="text-xs font-black uppercase text-slate-400 mb-1 tracking-widest">&nbsp;Joueurs</h3>
+                    <h3 class="text-xs font-black uppercase text-slate-400 mb-1 tracking-widest">&nbsp;Jugadores</h3>
                         
                     <!-- Fila 1: 1-5 + Control -->
                     <div class="grid grid-cols-6 gap-2 mb-2 items-center text-center">
@@ -412,21 +412,21 @@
 
                     <!-- Âge (1 de 3) -->
                     <div class="flex flex-col">              
-                        <h3 class="text-xs font-black uppercase text-slate-400 mb-1 tracking-widest">&nbsp;Âge</h3>
+                        <h3 class="text-xs font-black uppercase text-slate-400 mb-1 tracking-widest">&nbsp;Edad</h3>
                         <select v-model="filters.age" class="w-full bg-slate-50 border-2 border-slate-100 p-2 rounded-xl text-xs font-bold outline-none focus:border-indigo-500">
-                            <option :value="99">Sans limite</option>
-                            <option v-for="a in [12,10,8,6]" :value="a">{{a}}-{{a+1}} ans</option>
+                            <option :value="99">Sin límite</option>
+                            <option v-for="a in [12,10,8,6]" :value="a">{{a}}-{{a+1}} años</option>
                         </select>
                     </div>
                     
                     <!-- Material (1 de 3) -->
                     <div class="flex flex-col">
                         <div class="flex justify-between items-center mb-1">
-                            <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">&nbsp;Matériel</h3>
+                            <h3 class="text-xs font-black uppercase text-slate-400 tracking-widest">&nbsp;Material</h3>
                         </div>
                         <select v-model="filters.material" class="w-full bg-slate-50 border-2 border-slate-100 p-2 rounded-xl text-xs font-bold outline-none focus:border-indigo-500">
                             <option value="4">Maxi</option>
-                            <option value="3">Standard</option>
+                            <option value="3">Estándar</option>
                             <option value="2">Mini</option>
                             <option value="1">Micro</option>
                         </select>
@@ -437,7 +437,7 @@
                     <!-- 3. Groupe de 3 Boutons (Flash, Fav, New) -->
                     <div class="flex flex-col">
                         <!-- Etiqueta unificada para indicar que es un ORDEN -->
-                        <h3 class="text-xs font-black uppercase text-slate-400 text-center tracking-widest  mb-1">Priorité</h3>
+                        <h3 class="text-xs font-black uppercase text-slate-400 text-center tracking-widest  mb-1">Prioridad</h3>
                         <div class="grid grid-cols-3 gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
                             <!-- Botón Flash -->
                             <div class="has-tooltip">
@@ -446,7 +446,7 @@
                                         class="rounded-lg flex items-center w-full justify-center py-2 h-[30px] transition-all">
                                     <i class="fa-solid fa-bolt"></i>
                                 </button>
-                                <span class="tooltip-text">Démarrage rapide</span>
+                                <span class="tooltip-text">Comienzo rápido</span>
                             </div>
                             <!-- Botón Fav -->
                             <div class="has-tooltip">
@@ -459,7 +459,7 @@
                                     
                                     
                                 </button>
-                                <span class="tooltip-text">Meilleures adaptations</span>
+                                <span class="tooltip-text">Mejores adaptaciones</span>
                             </div>                                
                             <!-- Botón New -->
                             <div class="has-tooltip">
@@ -468,7 +468,7 @@
                                         class="rounded-lg flex items-center w-full justify-center py-2 h-[30px] transition-all">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                                 </button>
-                                <span class="tooltip-text">Nouveautés</span>
+                                <span class="tooltip-text">Novedades</span>
                             </div>
                         </div>
                     </div>
@@ -518,16 +518,16 @@
                 <!-- Pastillas de Categorías BGG -->
                 <div class="flex flex-wrap gap-2 mb-4">
                     <span v-if="game.catBGG.Famille" class="cat-pill">
-                        <i class="fa-solid fa-people-group"></i> Famille
+                        <i class="fa-solid fa-people-group"></i> Familia
                     </span>
                     <span v-if="game.catBGG.Party" class="cat-pill">
                         <i class="fa-solid fa-masks-theater"></i> Party
                     </span>
                     <span v-if="game.catBGG.Abstrait" class="cat-pill">
-                        <i class="fa-solid fa-chess-board"></i> Abstrait
+                        <i class="fa-solid fa-chess-board"></i> Abstracto
                     </span>
                     <span v-if="game.catBGG.Stratégie" class="cat-pill">
-                        <i class="fa-solid fa-gears"></i> Stratégie
+                        <i class="fa-solid fa-gears"></i> Estrategia
                     </span>
                 </div>                
 
@@ -537,14 +537,14 @@
                     
                     <p class="text-slate-600 text-s leading-relaxed">
                         <!---<span v-if="(game.authors)">Un jeu {{ formatAuthors(game.authors) }}</span>-->
-                        <span v-if="(game.authors)"><b>Création : </b>{{ (game.authors) }}</span>
+                        <span v-if="(game.authors)"><b>Autoría : </b>{{ (game.authors) }}</span>
                     </p>
                     
                     <!-- Feedback -->
                     <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-end">
                         <!-- Bloque de Votación -->
                         <div class="flex flex-col gap-2">
-                            <span class="text-indigo-600 text-s font-bold">J'ai testé l'adaptation :</span>
+                            <span class="text-indigo-600 text-s font-bold">He probado la adaptación:</span>
                             <div class="flex gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-100">
                                 <button v-for="(emoji, val) in {1:'😫', 2:'🙁', 3:'🙂', 4:'😍'}" 
                                         @click.stop="handleVote(game.name, parseInt(val))"
@@ -564,7 +564,7 @@
                                         {{ game.communityAvg }} <span class="text-xs text-slate-400 font-bold">/ 4</span>
                                     </div>
                                     <div class="community-count-text">
-                                        {{ game.communityCount }} votes
+                                        {{ game.communityCount }} votos
                                     </div>
                                     
                                 </div>
@@ -581,7 +581,7 @@
                                         {{ game.communityCount }} {{ Number(game.communityCount) === 1 ? 'vote' : 'votes' }}
                                     </span>
                                     -->
-                                    <span class="text-xs text-slate-400 italic">Moyenne à 5 votes</span>
+                                    <span class="text-xs text-slate-400 italic">Media a los 5 votos</span>
                                 </div>
                             </template>
                         </div>
@@ -589,7 +589,7 @@
 
                     <div class="flex flex-col gap-2 mt-4">
                         <p> 
-                            <span class="text-indigo-600 text-s font-bold">Fidélité au jeu d'origine : </span>
+                            <span class="text-indigo-600 text-s font-bold">Fidelidad al juego original: </span>
                             <span class="text-slate-900 text-s font-black"> {{ game.fidelityScore }} </span>
                             <span class="text-xs text-slate-400 font-black"> / 4</span>
                         </p>                            
@@ -602,7 +602,7 @@
                         <!-- BOTÓN 1: EL MÁS IMPORTANTE -->
                         <a :href="game.links.mobile" target="_blank" @click.stop 
                            class="btn-mobile font-bold py-3 rounded-xl text-center flex items-center justify-center gap-2 shadow-sm">
-                            <i class="fa-solid fa-mobile-screen-button opacity-70"></i> RÈGLES MOBILE
+                            <i class="fa-solid fa-mobile-screen-button opacity-70"></i> REGLAS MOVIL
                         </a>
                     
                         <div class="grid gap-2" :class="game.links.bgg ? 'grid-cols-2' : 'grid-cols-1'">
@@ -635,25 +635,23 @@
             <button @click="showHelpPopup = false" class="absolute top-4 right-6 text-slate-400 hover:text-slate-900">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
+                        
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase">Filtros jugadores</h3>
+            <p>Selecciona una o varias configuraciones. Los juegos ideales para el mayor número de ellas aparecen primero.</p>
             
-            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase">Filtres joueurs</h3>
-            <p>Sélectionnez une ou plusieurs configurations. Les jeux idéaux pour le plus grand nombre d'entre elles apparaissent en premier.</p>
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Material</h3>
+            <p><b>Micro</b> = Papel y bolígrafo (o incluso nada)</p>
+            <p><b>Mini</b> = Micro + 1 baraja de 52 cartas</p>
+            <p><b>Estándar</b> = Mini + 1 baraja extra, 10 fichas, 5 dados (o <a href="https://play.google.com/store/apps/details?id=fr.sevenpixels.dice" class="text-indigo-600 underline">app</a>), algunas hojas impresas</p>
+            <p><b>Maxi</b> = Estándar + material adicional o especial</p>
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Búsqueda textual</h3>
+            <p>Título, autor, año, mecánica, categoría BGG…</p>
+            <p class="text-slate-500"><i>Ej: "party", "dados", "bazas", "Knizia", "2019", "cooperativo"</i></p>
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Prioridad</h3>
+            <p><b>⚡</b> = rápido de explicar y de jugar</p>
+            <p><b>❤️</b> = mejores adaptaciones (primero tus favoritos, luego los de la comunidad)</p>
+            <p><b><span class="text-indigo-600"><i class="fa-solid fa-wand-magic-sparkles"></span></i></b> = las novedades primero</p>
             
-            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Matériel</h3>
-            <p><b>Micro</b> = Papier et stylo (ou même rien)</p>
-            <p><b>Mini</b> = Micro + 1 jeu de 52 cartes</p>
-            <p><b>Standard</b> = Mini + 1 jeu extra, 10 jetons, 5 dés (ou <a href = "https://play.google.com/store/apps/details?id=fr.sevenpixels.dice" class="text-indigo-600 underline">appli</a>), quelques feuilles imprimées</p>
-            <p><b>Maxi</b> = Standard + matériel additionnel ou spécial</p>
-
-            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Recherche textuelle</h3>
-            <p>Titre, auteur, année, mécanique, catégorie BGG…</p>
-            <p class="text-slate-500"><i>Ex : "party", "dés", "plis", "Knizia", "2019", "coopératif"</i></p>
-
-            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Priorité</h3>
-            <p><b>⚡</b> = rapide à expliquer et à jouer</p>
-            <p><b>❤️</b> = meilleures adaptations (d'abord vos favoris, ensuite ceux de la communauté)</p>
-            <p><b><span class="text-indigo-600"><i class="fa-solid fa-wand-magic-sparkles"></span></i></b> = les nouveautés d'abord</p>
-
         </div>
     </div>
 
@@ -664,15 +662,15 @@
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
 
-            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase">À propos des adaptations</h2>
-            <p class="mt-4">La plupart des jeux sont des adaptations de titres publiés, rendues jouables avec du matériel courant.</p>
-            <p class="mt-4">Règles, illustrations et éléments protégés sont recréés ; le jeu original est toujours cité.</p>
-            <p class="mt-4">Ce projet n'est pas un substitut: il encourage à découvrir les œuvres de leurs auteurs.</p>
-
-            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">Un bug ou une idée?</h2>
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase">Sobre las adaptaciones</h2>
+            <p class="mt-4">La mayoría de los juegos son adaptaciones de títulos publicados, hechas jugables con material corriente.</p>
+            <p class="mt-4">Reglas, ilustraciones y elementos protegidos se recrean; el juego original siempre se cita.</p>
+            <p class="mt-4">Este proyecto no es un sustituto: anima a descubrir las obras de sus autores.</p>
+                        
+            <h3 class="text-lg font-black text-indigo-600 leading-tight uppercase mt-4">¿Un bug o una idea?</h2>
             <button @click="openContactForm" class="w-auto btn-action-secondary py-3 rounded-xl font-bold flex items-center gap-2">
                 <i class="fa-solid fa-paper-plane text-indigo-500"></i>
-                Me contacter
+                Contáctame
             </button>
             
             
@@ -682,43 +680,43 @@
     <div v-if="showFeedbackModal" class="modal-overlay" @click.self="showFeedbackModal = false">
         <div class="modal-content">
             <h2 class="text-xl font-black uppercase text-slate-900 mb-2 text-center">
-                {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Me contacter' : 'Feedback sur l\'adaptation' }}
+                {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Contáctame' : 'Feedback sobre la adaptación' }}
             </h2>
             <p class="text-xs text-rose-600 font-bold mb-6 text-center uppercase tracking-tighter">
-                {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Dites-moi tout !' : 'Qu\'est-ce qui ne vous a pas convaincu ?' }}                
+                {{ currentFeedback.gameId === 'SITE_GLOBAL' ? 'Cuéntame todo!' : 'Qué es lo que no te ha convencido?' }}                
             </p>
             
             <div v-if="currentFeedback.gameId !== 'SITE_GLOBAL'" class="space-y-2 mb-6">
                 <!-- Usamos keys para mapear a las columnas del Excel -->
                 <label class="check-card">
                     <input type="checkbox" v-model="currentFeedback.issues.material">
-                    <span>Matériel peu pratique à manipuler</span>
+                    <span>Material poco práctico de manipular</span>
                 </label>
                 <label class="check-card">
                     <input type="checkbox" v-model="currentFeedback.issues.prep">
-                    <span>Préparation trop longue ou fastidieuse</span>
+                    <span>Preparación demasiado larga o tediosa</span>
                 </label>
                 <label class="check-card">
                     <input type="checkbox" v-model="currentFeedback.issues.rules">
-                    <span>Règles confuses ou incomplètes</span>
+                    <span>Reglas confusas o incompletas</span>
                 </label>
                 <label class="check-card">
                     <input type="checkbox" v-model="currentFeedback.issues.exp">
-                    <span>L'adaptation dénature l’esprit du jeu original</span>
+                    <span>La adaptación desvirtúa el espíritu del juego original</span>
                 </label>
                 <label class="check-card">
                     <input type="checkbox" v-model="currentFeedback.issues.game">
-                    <span>Simple question de goût (le jeu ne m’a pas plu)</span>
+                    <span>Simple cuestión de gustos (el juego no me convenció)</span>
                 </label>
             </div>
 
             <textarea v-model="currentFeedback.comment" 
-                      :placeholder="currentFeedback.gameId === 'SITE_GLOBAL' ? 'Votre message...' : 'Plus de détails (facultatif)...'"
+                      :placeholder="currentFeedback.gameId === 'SITE_GLOBAL' ? 'Tu mensaje...' : 'Más detalles (opcional)...'"
                       class="w-full bg-slate-50 border-2 border-slate-100 p-4 rounded-xl text-sm mb-4 h-24 outline-none focus:border-indigo-500"></textarea>
     
             <button @click="submitDetailedFeedback" :disabled="isSending"
                     class="btn-mobile w-full py-4 rounded-2xl uppercase font-black tracking-widest shadow-lg disabled:opacity-50">
-                {{ isSending ? 'Envoi...' : 'Envoyer' }}
+                {{ isSending ? 'Envío...' : 'Enviar' }}
             </button>
         </div>
     </div>
