@@ -868,7 +868,7 @@ createApp({
                 
                 const matchPlayer = this.selectedPlayers.length === 0 || this.selectedPlayers.every(p => game.players[p] && !game.players[p].includes('🔴'));
                 const matchAge = game.ageMin <= this.filters.age;
-                const configRank = { 'Mini': 1, 'Standard': 2, 'Maxi': 3 };
+                const configRank = {'Micro': 1, 'Mini': 2, 'Estándar': 3, 'Maxi': 4 };
                 const matchMaterial = game.configLevel <= this.filters.material;
                 return matchPlayer && matchAge && matchMaterial;
             }).sort((a, b) => {
